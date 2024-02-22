@@ -37,11 +37,14 @@ USER jboss
 # Expose the ports in which we're interested
 EXPOSE 8080
 
+# Download MySQL JDBC Connector
+ADD https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar /opt/jboss/wildfly/bin
+
 # Add war to the deployments folder
 ADD target/*.war /opt/jboss/wildfly/standalone/deployments/
 
-# Set the default command to run on boot
-# This will boot WildFly in standalone mode and bind to all interfaces
+COPY customize-wildfly.sh /opt/jboss
+
+RUN /opt/jboss/customize-wildfly.sh
+
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0"]
-
-
