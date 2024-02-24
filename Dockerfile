@@ -1,50 +1,17 @@
-# By default, build on JDK 17 on CentOS 7.
-ARG jdk=17
-# Red Hat UBI 9 (ubi9-minimal) should be used on JDK 20 and later.
-ARG dist=centos7
-FROM eclipse-temurin:${jdk}-${dist}
-
-LABEL org.opencontainers.image.source=https://github.com/jboss-dockerfiles/wildfly org.opencontainers.image.title=wildfly org.opencontainers.imag.url=https://github.com/jboss-dockerfiles/wildfly org.opencontainers.image.vendor=WildFly
-
-WORKDIR /opt/jboss
-
-RUN groupadd -r jboss -g 1000 && useradd -u 1000 -r -g jboss -m -d /opt/jboss -s /sbin/nologin -c "JBoss user" jboss && \
-    chmod 755 /opt/jboss
-
-# Set the WILDFLY_VERSION env variable
-ENV WILDFLY_VERSION 31.0.0.Final
-ENV WILDFLY_SHA1 5d02503c696c230d0803456c29d03d60776da339
-ENV JBOSS_HOME /opt/jboss/wildfly
-
-USER root
-
-# Add the WildFly distribution to /opt, and make wildfly the owner of the extracted tar content
-# Make sure the distribution is available from a well-known place
-RUN cd $HOME \
-    && curl -L -O https://github.com/wildfly/wildfly/releases/download/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
-    && sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 \
-    && tar xf wildfly-$WILDFLY_VERSION.tar.gz \
-    && mv $HOME/wildfly-$WILDFLY_VERSION $JBOSS_HOME \
-    && rm wildfly-$WILDFLY_VERSION.tar.gz \
-    && chown -R jboss:0 ${JBOSS_HOME} \
-    && chmod -R g+rw ${JBOSS_HOME}
-
-# Ensure signals are forwarded to the JVM process correctly for graceful shutdown
-ENV LAUNCH_JBOSS_IN_BACKGROUND true
-
-USER jboss
-
-# Expose the ports in which we're interested
-EXPOSE 8080
+FROM quay.io/wildfly/wildfly:latest-jdk20
 
 # Download MySQL JDBC Connector
-ADD https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar /opt/jboss/wildfly/bin
+#ADD --chown=jboss:jboss --chmod=666 https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar /tmp/mysql-connector-j-8.3.0.jar
+
+RUN /bin/sh -c '$JBOSS_HOME/bin/standalone.sh &' && \
+    wget -P /tmp https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar && \
+    sleep 8 && \
+    $JBOSS_HOME/bin/jboss-cli.sh --connect --command="module add --name=com.mysql --resources=/tmp/mysql-connector-j-8.3.0.jar --dependencies=javax.api,javax.transaction.api" && \
+    $JBOSS_HOME/bin/jboss-cli.sh --connect --command="/subsystem=datasources/jdbc-driver=mysql:add(driver-name=mysql,driver-module-name=com.mysql)" && \
+    $JBOSS_HOME/bin/jboss-cli.sh --connect --command='data-source add --jndi-name=java:/MySqlDS --name=MySQLPool --connection-url=${DB_CONNECTION_URL:jdbc:mysql://localhost:3306} --driver-name=mysql --user-name=${DB_USERNAME:root} --password=${DB_PASSWORD:password}' &&\
+    $JBOSS_HOME/bin/jboss-cli.sh --connect --command=":shutdown" && \
+    rm -r /opt/jboss/wildfly/standalone/configuration/standalone_xml_history/current/* && \
+    rm /tmp/mysql-connector-j-8.3.0.jar
 
 # Add war to the deployments folder
 ADD target/*.war /opt/jboss/wildfly/standalone/deployments/
-
-COPY customize-wildfly.sh /opt/jboss
-
-RUN /opt/jboss/customize-wildfly.sh
-
-CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0"]

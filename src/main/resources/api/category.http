@@ -1,0 +1,27 @@
+### ALL
+GET http://localhost:8080/app/api/categories
+
+### Single
+GET http://localhost:8080/app/api/categories/1
+
+###
+POST  http://localhost:8080/app/api/categories
+Content-Type: application/json
+
+{
+  "category_name": "{{$random.alphabetic(3)}}",
+  "description": "{{$random.alphanumeric(15)}}"
+}
+
+
+###
+PUT http://localhost:8080/app/api/categories/1
+Content-Type: application/json
+
+{
+  "description": "This was changed"
+}
+
+
+###
+DELETE http://localhost:8080/app/api/categories/1

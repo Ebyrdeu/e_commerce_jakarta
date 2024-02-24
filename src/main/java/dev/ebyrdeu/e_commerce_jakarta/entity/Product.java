@@ -1,17 +1,19 @@
 package dev.ebyrdeu.e_commerce_jakarta.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "product", schema = "e_commerce")
+@Table(name = "product", schema = "e_commerce_jakarta")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,13 +45,16 @@ public class Product {
     @Column(name = "stock", nullable = false)
     private Integer stock;
 
-    @Column(name = "created_at")
-    @CreationTimestamp(source = SourceType.DB)
-    private Instant createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    private Date createdAt;
 
     @Column(name = "updated_at")
-    @UpdateTimestamp(source = SourceType.DB)
-    private Instant updatedAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    private Date updatedAt;
+
 
     public Set<Order> orders() {
         return orders;
@@ -79,11 +84,11 @@ public class Product {
         return stock;
     }
 
-    public Instant createdAt() {
+    public Date createdAt() {
         return createdAt;
     }
 
-    public Instant updatedAt() {
+    public Date updatedAt() {
         return updatedAt;
     }
 

@@ -2,13 +2,12 @@ package dev.ebyrdeu.e_commerce_jakarta.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Entity
-@Table(name = "customer", schema = "e_commerce")
+@Table(name = "customer", schema = "e_commerce_jakarta")
 public class Customer {
 
     @Id
@@ -34,13 +33,15 @@ public class Customer {
     @Column(name = "phone", length = 15, unique = true)
     private String phone;
 
-    @Column(name = "created_at")
-    @CreationTimestamp(source = SourceType.DB)
-    private Instant createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    private Date createdAt;
 
     @Column(name = "updated_at")
-    @UpdateTimestamp(source = SourceType.DB)
-    private Instant updatedAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    private Date updatedAt;
 
     public Long id() {
         return id;
@@ -70,11 +71,11 @@ public class Customer {
         return phone;
     }
 
-    public Instant createdAt() {
+    public Date createdAt() {
         return createdAt;
     }
 
-    public Instant updatedAt() {
+    public Date updatedAt() {
         return updatedAt;
     }
 

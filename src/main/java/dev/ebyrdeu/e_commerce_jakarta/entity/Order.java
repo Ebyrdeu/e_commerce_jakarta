@@ -6,12 +6,13 @@ import org.hibernate.annotations.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "`order`", schema = "e_commerce")
+@Table(name = "`order`", schema = "e_commerce_jakarta")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,20 +30,24 @@ public class Order {
             inverseJoinColumns = {@JoinColumn(name = "product_id")}
     )
     private Set<Product> products = new HashSet<>();
-    @Column(name = "order_date")
-    @CreationTimestamp(source = SourceType.DB)
+    @Column(name = "order_date", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Instant orderDate;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
     @Column(name = "total", nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
-    @Column(name = "created_at")
-    @CreationTimestamp(source = SourceType.DB)
-    private Instant createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    private Date createdAt;
+
     @Column(name = "updated_at")
-    @UpdateTimestamp(source = SourceType.DB)
-    private Instant updatedAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    private Date updatedAt;
 
     public Set<Product> products() {
         return products;
@@ -68,11 +73,11 @@ public class Order {
         return total;
     }
 
-    public Instant createdAt() {
+    public Date createdAt() {
         return createdAt;
     }
 
-    public Instant updatedAt() {
+    public Date updatedAt() {
         return updatedAt;
     }
 

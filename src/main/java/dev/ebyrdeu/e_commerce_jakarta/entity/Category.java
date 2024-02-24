@@ -10,7 +10,7 @@ import java.time.Instant;
 
 @Entity
 @DynamicUpdate
-@Table(name = "category", schema = "e_commerce")
+@Table(name = "category", schema = "e_commerce_jakarta")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,5 +65,4 @@ public class Category {
         this.description = description;
         return this;
     }
-
 }
