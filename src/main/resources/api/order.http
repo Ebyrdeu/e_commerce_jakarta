@@ -1,0 +1,30 @@
+### ALL
+GET http://localhost:8080/app/api/orders
+
+### Single
+GET http://localhost:8080/app/api/orders/1
+
+###
+POST  http://localhost:8080/app/api/orders
+Content-Type: application/json
+
+{
+  "customer_id": 1,
+  "order_date": "{{$timestamp}}",
+  "status": 2,
+  "total": 150.00,
+  "products": [1, 3, 5]
+}
+
+
+###
+PUT http://localhost:8080/app/api/orders/1
+Content-Type: application/json
+
+{
+  "status": 3
+}
+
+
+###
+DELETE http://localhost:8080/app/api/orders/1

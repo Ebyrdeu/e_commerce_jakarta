@@ -1,8 +1,10 @@
 package dev.ebyrdeu.e_commerce_jakarta.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -106,6 +108,9 @@ public class Order {
         return this;
     }
 
+    public void setProducts(Set<Product> products) {
+        this.products = products;
+    }
 
     @Override
     public boolean equals(Object o) {

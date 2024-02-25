@@ -122,6 +122,11 @@ public class Product {
         return this;
     }
 
+    public Product setOrders(Set<Order> orders) {
+        this.orders = orders;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

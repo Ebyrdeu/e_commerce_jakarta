@@ -1,0 +1,33 @@
+### ALL
+GET http://localhost:8080/app/api/products
+
+### Single
+GET http://localhost:8080/app/api/products/1
+
+###
+POST  http://localhost:8080/app/api/products
+Content-Type: application/json
+
+{
+  "category": {
+   "id": 1
+  },
+  "product_name": "{{$random.alphabetic(10)}}",
+  "product_description": "{{$random.alphabetic(10)}}",
+  "price": "{{$random.float(3)}}",
+  "stock": 100,
+  "orders": []
+}
+
+
+###
+PUT http://localhost:8080/app/api/products/1
+Content-Type: application/json
+
+{
+  "product_description": "this was changed"
+}
+
+
+###
+DELETE http://localhost:8080/app/api/products/1

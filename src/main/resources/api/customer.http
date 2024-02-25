@@ -1,0 +1,32 @@
+### ALL
+GET http://localhost:8080/app/api/customers
+
+### Single
+GET http://localhost:8080/app/api/customers/1
+
+###
+POST  http://localhost:8080/app/api/customers
+Content-Type: application/json
+
+{
+  "first_name": "{{$random.alphabetic(5)}}",
+  "last_name": "{{$random.alphabetic(10)}}",
+  "email": "{{$random.email}}",
+  "username": "{{$random.alphabetic(3)}}",
+  "password": "{{$random.uuid}}",
+  "phone": "{{$random.alphanumeric(9)}}"
+}
+
+
+###
+PUT http://localhost:8080/app/api/customers/1
+Content-Type: application/json
+
+{
+  "first_name": "Bobba",
+  "last_name": "Fet"
+}
+
+
+###
+DELETE http://localhost:8080/app/api/customers/1

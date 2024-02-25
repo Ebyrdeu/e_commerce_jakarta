@@ -9,6 +9,8 @@ import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
 
+import static dev.ebyrdeu.e_commerce_jakarta.utils.Utils.isNotNull;
+
 
 @ApplicationScoped
 public class CategoryRepositoryImpl implements CategoryRepositroy {
@@ -42,8 +44,8 @@ public class CategoryRepositoryImpl implements CategoryRepositroy {
             throw new NotFoundException("Category with id: " + entity.id() + " not found");
         }
 
-        existingEntity.setName(entity.name() != null ? entity.name() : existingEntity.name());
-        existingEntity.setDescription(entity.description() != null ? entity.description() : existingEntity.description());
+        isNotNull(existingEntity::setName, entity.name());
+        isNotNull(existingEntity::setDescription, entity.description());
 
         em.merge(existingEntity);
 
