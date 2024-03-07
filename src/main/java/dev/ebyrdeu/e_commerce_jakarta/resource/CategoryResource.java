@@ -3,6 +3,7 @@ package dev.ebyrdeu.e_commerce_jakarta.resource;
 import dev.ebyrdeu.e_commerce_jakarta.dto.category.CategoryDto;
 import dev.ebyrdeu.e_commerce_jakarta.serivce.category.CategoryService;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -39,8 +40,8 @@ public class CategoryResource {
     @PUT
     @Path("/{id}")
     public Response update(@PathParam("id") long id, CategoryDto categoryDto) {
-        var category = service.update(id, categoryDto);
-        return Response.ok().entity(CategoryDto.map(category)).build();
+        service.update(id, categoryDto);
+        return Response.ok().build();
     }
 
     @DELETE
@@ -51,7 +52,7 @@ public class CategoryResource {
     }
 
     @POST
-    public Response create(CategoryDto categoryDto) {
+    public Response create(@Valid CategoryDto categoryDto) {
         var category = service.create(categoryDto);
         return Response.status(201).entity(CategoryDto.map(category)).build();
     }

@@ -4,63 +4,41 @@ import dev.ebyrdeu.e_commerce_jakarta.entity.Category;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
-
-import static dev.ebyrdeu.e_commerce_jakarta.utils.Utils.isNotNull;
+import java.util.Optional;
 
 
 @ApplicationScoped
-public class CategoryRepositoryImpl implements CategoryRepositroy {
+public class CategoryRepositoryImpl implements CategoryRepository {
     @PersistenceContext(unitName = "default")
     EntityManager em;
 
     @Override
     public List<Category> getAll() {
-        var query = "select c from  Category c";
+        var query = "SELECT c FROM Category c";
         return em.createQuery(query, Category.class).getResultList();
     }
 
     @Override
-    public Category getOne(Category entity) {
-        return em.find(Category.class, entity.id());
+    public Optional<Category> getOne(Long id) {
+        return Optional.ofNullable(em.find(Category.class, id));
     }
 
     @Override
-    @Transactional
     public Category create(Category entity) {
         em.persist(entity);
+
         return entity;
     }
 
     @Override
-    @Transactional
-    public Category update(Category entity) {
-        var existingEntity = em.find(Category.class, entity.id());
-
-        if (existingEntity == null) {
-            throw new NotFoundException("Category with id: " + entity.id() + " not found");
-        }
-
-        isNotNull(existingEntity::setName, entity.name());
-        isNotNull(existingEntity::setDescription, entity.description());
-
-        em.merge(existingEntity);
-
-        return existingEntity;
+    public void update(Category entity) {
+        em.merge(entity);
     }
 
     @Override
-    @Transactional
     public void remove(Category entity) {
-        var existingEntity = em.find(Category.class, entity.id());
-
-        if (existingEntity == null) {
-            throw new NotFoundException("Category with id: " + entity.id() + " not found");
-        }
-
-        em.remove(existingEntity);
+        em.remove(entity);
     }
 }

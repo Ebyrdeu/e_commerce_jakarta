@@ -1,14 +1,16 @@
 package dev.ebyrdeu.e_commerce_jakarta.serivce;
 
-public interface Service<T, D, D2> {
+import java.util.List;
 
-    D2 getAll();
+public interface Service<T, D> {
+
+    List<D> getAll();
 
     T getOne(long id);
 
     T create(D dto);
 
-    T update(long id, D dto);
+    void update(long id, D dto);
 
     void remove(long id);
 }

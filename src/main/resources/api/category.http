@@ -2,7 +2,7 @@
 GET http://localhost:8080/app/api/categories
 
 ### Single
-GET http://localhost:8080/app/api/categories/1
+GET http://localhost:8080/app/api/categories/2
 
 ###
 POST  http://localhost:8080/app/api/categories
@@ -15,11 +15,10 @@ Content-Type: application/json
 
 
 ###
-PUT http://localhost:8080/app/api/categories/1
+PUT http://localhost:8080/app/api/categories/2
 Content-Type: application/json
 
 {
-  "description": "This was changed"
 }
 
 

@@ -8,8 +8,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
-
-import static dev.ebyrdeu.e_commerce_jakarta.utils.Utils.isNotNull;
+import java.util.Optional;
 
 
 @ApplicationScoped
@@ -19,13 +18,13 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public List<Customer> getAll() {
-        var query = "select c from  Customer  c";
+        var query = "SELECT c FROM  Customer  c";
         return em.createQuery(query, Customer.class).getResultList();
     }
 
     @Override
-    public Customer getOne(Customer entity) {
-        return em.find(Customer.class, entity.id());
+    public Optional<Customer> getOne(Long id) {
+        return Optional.ofNullable(em.find(Customer.class, id));
     }
 
     @Override
@@ -37,21 +36,8 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     @Transactional
-    public Customer update(Customer entity) {
-        var existingEntity = em.find(Customer.class, entity.id());
-
-        if (existingEntity == null) {
-            throw new NotFoundException("Category with id: " + entity.id() + " not found");
-        }
-
-        isNotNull(existingEntity::setFirstName, entity.firstName());
-        isNotNull(existingEntity::setLastName, entity.lastName());
-        isNotNull(existingEntity::setEmail, entity.email());
-        isNotNull(existingEntity::setUsername, entity.username());
-        isNotNull(existingEntity::setPassword, entity.password());
-        isNotNull(existingEntity::setPhone, entity.phone());
-
-        return existingEntity;
+    public void update(Customer entity) {
+        em.merge(entity);
     }
 
 

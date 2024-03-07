@@ -15,7 +15,7 @@ Content-Type: application/json
   "product_name": "{{$random.alphabetic(10)}}",
   "product_description": "{{$random.alphabetic(10)}}",
   "price": "{{$random.float(3)}}",
-  "stock": 100,
+  "stock": "{{$random.alphanumeric(3)}}",
   "orders": []
 }
 

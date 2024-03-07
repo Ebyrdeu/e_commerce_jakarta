@@ -1,12 +1,16 @@
 package dev.ebyrdeu.e_commerce_jakarta.serivce.order;
 
 import dev.ebyrdeu.e_commerce_jakarta.dto.order.OrderDto;
-import dev.ebyrdeu.e_commerce_jakarta.dto.order.Orders;
 import dev.ebyrdeu.e_commerce_jakarta.entity.Order;
 import dev.ebyrdeu.e_commerce_jakarta.repository.order.OrderRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.NotFoundException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
+import java.util.List;
+
+import static dev.ebyrdeu.e_commerce_jakarta.utils.Utils.isNotNull;
 
 @ApplicationScoped
 public class OrderServiceImpl implements OrderService {
@@ -21,40 +25,35 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Orders getAll() {
-        return new Orders(
-                repository.getAll().stream().map(OrderDto::map).toList()
-        );
+    public List<OrderDto> getAll() {
+        return repository.getAll().stream().map(OrderDto::map).toList();
     }
 
     @Override
     public Order getOne(long id) {
-        var order = repository.getOne(new Order().setId(id));
-
-        if (order == null) {
-            throw new NotFoundException("Product with id not found");
-        }
-
-        return order;
+        return repository.getOne(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + "not found"));
     }
 
     @Override
+    @Transactional
     public Order create(OrderDto dto) {
-
-//        TODO: change to DTO
         return repository.create(OrderDto.map(dto));
     }
 
     @Override
-    public Order update(long id, OrderDto dto) {
-        return repository.update(new Order()
-                .setId(id)
-                .setOrderDate(dto.orderDate())
-                .setStatus(dto.status())
-        );
+    @Transactional
+    public void update(long id, OrderDto dto) {
+        var existingEntity = repository.getOne(id).orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + "not found"));
+
+        isNotNull(existingEntity::setStatus, dto.status());
+        isNotNull(existingEntity::setOrderDate, dto.orderDate());
+
+        repository.update(existingEntity);
     }
 
     @Override
+    @Transactional
     public void remove(long id) {
         repository.remove(new Order().setId(id));
     }

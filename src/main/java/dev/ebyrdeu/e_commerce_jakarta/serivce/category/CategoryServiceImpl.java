@@ -1,55 +1,64 @@
 package dev.ebyrdeu.e_commerce_jakarta.serivce.category;
 
-import dev.ebyrdeu.e_commerce_jakarta.dto.category.Categories;
 import dev.ebyrdeu.e_commerce_jakarta.dto.category.CategoryDto;
 import dev.ebyrdeu.e_commerce_jakarta.entity.Category;
-import dev.ebyrdeu.e_commerce_jakarta.repository.category.CategoryRepositroy;
+import dev.ebyrdeu.e_commerce_jakarta.repository.category.CategoryRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.NotFoundException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
+import java.util.List;
+
+import static dev.ebyrdeu.e_commerce_jakarta.utils.Utils.isNotNull;
 
 @ApplicationScoped
 public class CategoryServiceImpl implements CategoryService {
-    private CategoryRepositroy repository;
+    private CategoryRepository repository;
 
     public CategoryServiceImpl() {
     }
 
     @Inject
-    public CategoryServiceImpl(CategoryRepositroy repository) {
+    public CategoryServiceImpl(CategoryRepository repository) {
         this.repository = repository;
     }
 
     @Override
-    public Categories getAll() {
-        return new Categories(
-                repository.getAll().stream().map(CategoryDto::map).toList()
-        );
+    public List<CategoryDto> getAll() {
+        return repository.getAll().stream().map(CategoryDto::map).toList();
     }
 
     @Override
     public Category getOne(long id) {
-        var category = repository.getOne(new Category().setId(id));
-
-        if (category == null) {
-            throw new NotFoundException("Category with id not found");
-        }
-        return category;
+        return repository.getOne(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + "not found"));
     }
 
     @Override
+    @Transactional
     public Category create(CategoryDto dto) {
-//        TODO: change to DTO
         return repository.create(CategoryDto.map(dto));
     }
 
     @Override
-    public Category update(long id, CategoryDto dto) {
-        return repository.update(new Category().setId(id).setDescription(dto.description()).setName(dto.category_name()));
+    @Transactional
+    public void update(long id, CategoryDto dto) {
+        var existingCategory = repository.getOne(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + "not found"));
+
+        isNotNull(existingCategory::setName, dto.category_name());
+        isNotNull(existingCategory::setDescription, dto.description());
+
+        repository.update(existingCategory);
     }
 
     @Override
+    @Transactional
     public void remove(long id) {
-        repository.remove(new Category().setId(id));
+        var existingCategory = repository.getOne(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + "not found"));
+
+        repository.remove(existingCategory);
     }
 }

@@ -3,6 +3,7 @@ package dev.ebyrdeu.e_commerce_jakarta.resource;
 import dev.ebyrdeu.e_commerce_jakarta.dto.customer.CustomerDto;
 import dev.ebyrdeu.e_commerce_jakarta.serivce.customer.CustomerService;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -38,8 +39,8 @@ public class CustomerResource {
     @PUT
     @Path("/{id}")
     public Response update(@PathParam("id") long id, CustomerDto customerDto) {
-        var customer = service.update(id, customerDto);
-        return Response.ok().entity(CustomerDto.map(customer)).build();
+        service.update(id, customerDto);
+        return Response.ok().build();
     }
 
 
@@ -52,7 +53,7 @@ public class CustomerResource {
 
 
     @POST
-    public Response create(CustomerDto customerDto) {
+    public Response create(@Valid CustomerDto customerDto) {
         var customer = service.create(customerDto);
         return Response.status(201).entity(CustomerDto.map(customer)).build();
     }

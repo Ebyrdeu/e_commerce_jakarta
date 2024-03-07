@@ -7,7 +7,6 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -32,15 +31,19 @@ public class Order {
             inverseJoinColumns = {@JoinColumn(name = "product_id")}
     )
     private Set<Product> products = new HashSet<>();
+
     @Column(name = "order_date", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
-    private Instant orderDate;
+    private Date orderDate;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
+
     @Column(name = "total", nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
@@ -63,7 +66,7 @@ public class Order {
         return customer;
     }
 
-    public Instant orderDate() {
+    public Date orderDate() {
         return orderDate;
     }
 
@@ -93,7 +96,7 @@ public class Order {
         return this;
     }
 
-    public Order setOrderDate(Instant orderDate) {
+    public Order setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
         return this;
     }
@@ -105,6 +108,16 @@ public class Order {
 
     public Order setTotal(BigDecimal total) {
         this.total = total;
+        return this;
+    }
+
+    public Order setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
+    public Order setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
         return this;
     }
 
@@ -122,6 +135,6 @@ public class Order {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return getClass().hashCode();
     }
 }
